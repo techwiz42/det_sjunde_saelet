@@ -1,0 +1,51 @@
+schema: spec-driven
+
+# Project context (shown to AI when creating artifacts)
+context: |
+  "Det sjunde sälet" ("The Seventh Seal", with seals) is a stills-only comedic
+  short film pipeline, La Jetée-style: AI-generated still images animated only
+  by slow Ken Burns pans/pushes, cut together with narration and music.
+
+  Tech stack: Python 3.11+, ffmpeg (all video/audio work), PyYAML, Pillow,
+  edge-tts, pytest. No web framework, no database -- this is a local batch
+  pipeline driven by two YAML files (config.yaml, shots.yaml) and a set of
+  scripts under scripts/.
+
+  Hard constraints (violating any of these is a defect, not a style choice):
+    - Zero cost. No paid APIs anywhere in the pipeline. Image generation is
+      manual and explicitly outside the pipeline -- scripts only emit prompts
+      and ingest whatever stills the user brings back from a free generator.
+    - Narration is edge-tts (free) by default, structured so switching to
+      OpenAI tts-1-hd/"onyx" later is a one-value config change
+      (config.yaml: tts.engine), not a code change.
+    - The film is black and white -- render_shot.py bakes in a fixed
+      monochrome grade (desaturate, slight contrast lift, gentle vignette).
+      No other stylization belongs in the render step.
+    - Generated artifacts (takes/*.mp4, build/*.mp4) are never overwritten --
+      every render gets the next incrementing suffix.
+    - Every script fails gracefully per-shot: a missing still or narration
+      file marks that shot `blocked` in the catalog and the rest of the
+      build continues, substituting a 2-second slate card. A bad shot must
+      never abort the whole pipeline run.
+    - Shot state (needs_prompt / awaiting_still / needs_select / ready /
+      blocked) is always computed live from shots.yaml + select.json + the
+      actual filesystem contents (scripts/common.py:compute_state) -- never
+      cached in a way that could go stale.
+
+  Conventions:
+    - Character appearance lives once in shots.yaml's `anchors:` block and is
+      spliced onto prompts by emit_prompts.py -- a shot's own `image_prompt`
+      is scene-only (setting/action/camera/light), never a repeated physical
+      description.
+    - Raw stills follow `<shot_id>_v<N>.<ext>` in stills/raw/; takes follow
+      `<shot_id>_take<N>.mp4` in takes/; both directories are scanned live,
+      not tracked in a separate index.
+
+# Per-artifact rules
+rules:
+  proposal:
+    - State plainly which of the two constraints (zero-cost, never-overwrite,
+      fail-gracefully, monochrome-only grade) a change touches, if any.
+  tasks:
+    - Call out any new script explicitly, and whether it needs a
+      corresponding tests/test_*.py for timing/state math.
