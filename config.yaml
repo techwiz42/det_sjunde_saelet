@@ -1,0 +1,66 @@
+# Global settings for the "Det sjunde sälet" stills-only pipeline.
+# Every script reads this file; nothing here should require editing scripts.
+
+resolution:
+  width: 1920
+  height: 1080
+
+fps: 24
+
+# --- Narration -------------------------------------------------------------
+# engine: "edge_tts" (free, default) or "openai" (paid, not wired up here --
+# flip engine to "openai" and fill in the openai block once that pipeline
+# exists; narrate.py dispatches on this one value).
+tts:
+  engine: edge_tts
+  edge_tts:
+    # A measured, formal voice for a solemn narrator playing it straight.
+    voice: "en-GB-ThomasNeural"
+    rate: "-6%"
+    pitch: "-2Hz"
+  openai:
+    model: "tts-1-hd"
+    voice: "onyx"
+
+# --- Monochrome grade (baked into render_shot.py's ffmpeg filter chain) ---
+grade:
+  saturation: 0.0          # 0.0 = full desaturation
+  contrast: 1.08            # slight lift
+  brightness: 0.0
+  gamma: 1.0
+  vignette: true
+  vignette_strength: 0.30   # 0-1, fed to ffmpeg vignette angle/opacity
+
+# --- Ken Burns motion --------------------------------------------------------
+motion:
+  ease: sine_in_out         # only supported curve for now; see render_shot.py
+  supersample: 2            # zoompan supersampling factor (quality vs. render time)
+
+crossfade_frames: 12
+
+# --- Narration/shot timing rules --------------------------------------------
+timing:
+  min_padding_after_narration: 0.5   # seconds added after narration if it overruns shot duration
+
+# --- Ingest validation --------------------------------------------------------
+ingest:
+  min_long_edge_px: 2200
+  allowed_extensions: [".png", ".jpg", ".jpeg"]
+
+# --- Paths (all relative to project root) ------------------------------------
+paths:
+  shots_file: shots.yaml
+  select_file: select.json
+  catalog_file: CATALOG.md
+  prompts_dir: prompts
+  stills_raw_dir: stills/raw
+  stills_selected_dir: stills/selected
+  narration_dir: audio/narration
+  music_dir: audio/music
+  takes_dir: takes
+  build_dir: build
+
+# Fixed style suffix appended to every emitted image prompt.
+style_suffix: >-
+  black and white photograph, 1957 Swedish art cinema, deep shadows,
+  natural light, 35mm film grain, photorealistic.

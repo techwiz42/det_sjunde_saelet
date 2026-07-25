@@ -1,0 +1,925 @@
+# Det sjunde sälet — shot list.
+#
+# `anchors` are the fixed character-description blocks referenced by shot
+# entries. scripts/emit_prompts.py splices the anchor text for every name in
+# a shot's `characters` list onto the front of that shot's `image_prompt`,
+# in list order, followed by the scene text below and finally the global
+# `style_suffix` from config.yaml. This is why `image_prompt` below is
+# SCENE-ONLY (setting/action/composition/camera/light) — it never repeats a
+# character's physical description, so the look stays consistent by
+# construction: change an anchor once here and every prompt that uses it
+# picks up the change next time emit_prompts.py runs.
+#
+# `cut: hard` on a shot means the transition INTO that shot (from whatever
+# precedes it) is a hard cut. Its absence means the default 12-frame
+# crossfade (config.yaml: crossfade_frames) applies. Hard cuts are reserved
+# for act/location breaks.
+#
+# `motion.amount` is the fraction of the frame traversed over the shot's
+# full duration — keep these small, the moves must be barely perceptible.
+# `hold` shots carry amount: 0.0 by convention (render_shot.py ignores
+# amount for `hold` regardless, but a stated 0.0 keeps the intent explicit
+# in the data rather than implicit in code).
+
+anchors:
+  antonius: >-
+    Antonius, a lean grey harbor seal with a faded red-and-white striped
+    ruff collar at the neck, sharp intelligent eyes, and a deck of worn
+    playing cards always near one flipper
+  jons: >-
+    Jöns, a heavyset grizzled harbor seal with a scarred muzzle, a small
+    cracked monocle over one eye, and a threadbare black tailcoat collar,
+    wearing a permanently weary expression
+  skat: >-
+    Skat, a sleek harbor seal in a diamond-patterned harlequin ruff and a
+    small peaked jester's cap strapped beneath the chin, with exaggerated
+    painted markings around the eyes
+  plog: >-
+    Plog, a broad-shouldered bull seal in a striped strongman's collar, a
+    loose padlocked chain draped around the neck, and a dented tin medal
+    pinned crookedly to the chest
+  raval: >-
+    Raval, a thin, shifty-eyed harbor seal in a patched carnival vest and a
+    wide oilskin collar, one flipper permanently resting near a small
+    wooden ventriloquist's crate
+  lilla_gunnar: >-
+    Lilla Gunnar, a herring hand-puppet with two painted-on eyes, a tiny
+    hand-stitched felt bowtie, and a plain wooden dowel visible where a
+    hand would hold it from below
+  jof: >-
+    Jof, a young harbor seal with an unusually gentle, wide-eyed expression
+    and a faded blue neckerchief, often tilting his head as though
+    listening to something no one else can hear
+  selkirk: >-
+    Dr. S. Selkirk, a distinguished harbor seal with round tortoiseshell
+    spectacles, silver-flecked whiskers, and a dark knit tie neatly knotted
+    at the throat, composed and clinical in bearing
+  death: >-
+    Death, a tall gaunt figure in a heavy black hooded robe, a pale hollow
+    face half lost in shadow beneath the hood, long white hands, and an
+    utterly still, unhurried posture
+
+shots:
+  # ─── Act 1: the stay ──────────────────────────────────────────────────
+  - id: "010_dawn_shore"
+    act: 1
+    publish_order: 1
+    production_priority: high
+    duration: 6.0
+    characters: []
+    image_prompt: >-
+      Wide static shot along an empty stony Baltic shoreline at first
+      light. Flat calm sea, low raking sun just above the horizon, cold
+      mist low over the water, no figures present, long lens compression,
+      soft contrast.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      The coast keeps its own counsel. It has seen circuses before, and it
+      will see this one leave.
+    music_cue: "bach_air_on_the_g_string.mp3"
+
+  - id: "020_circus_on_the_bluff"
+    act: 1
+    publish_order: 2
+    production_priority: medium
+    duration: 6.0
+    characters: []
+    image_prompt: >-
+      Wide shot from the shoreline looking up at a cluster of weathered
+      circus wagons and patched canvas tents on a grassy bluff, dawn mist
+      drifting between the wagon wheels, no figures visible, wide-angle
+      lens, directional side light.
+    motion:
+      type: pan_right
+      amount: 0.05
+    narration: >-
+      Six brothers work the shoreline towns, north, always north, one week
+      ahead of the rumor that they are not very good.
+    music_cue: null
+
+  - id: "030_skat_and_plog"
+    act: 1
+    publish_order: 3
+    production_priority: high
+    duration: 7.0
+    characters: ["skat", "plog"]
+    image_prompt: >-
+      Medium shot in a cramped canvas-and-rope backstage corridor. Skat
+      mid-flourish in an exaggerated commedia dell'arte bow in the
+      foreground; Plog straining theatrically against a loose chain
+      wrapped around his body in the background. Single hard key light
+      from an oil lamp, shallow depth of field.
+    motion:
+      type: pan_left
+      amount: 0.05
+    narration: >-
+      Skat performs the old comedies. Plog escapes from chains, which is a
+      considerable achievement for an animal with no wrists.
+    music_cue: null
+
+  - id: "040_jof_watches"
+    act: 1
+    publish_order: 4
+    production_priority: medium
+    duration: 5.0
+    characters: ["jof"]
+    image_prompt: >-
+      Medium close shot of Jof standing at the edge of the wings, head
+      tilted, gaze fixed on something well off-frame that is plainly not
+      there. Soft top light, gentle falloff into shadow, 85mm-equivalent
+      compression.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Jof sees things that are not there. He has learned not to mention it
+      before breakfast.
+    music_cue: null
+
+  - id: "050_antonius_alone"
+    act: 1
+    publish_order: 5
+    production_priority: high
+    duration: 7.0
+    characters: ["antonius"]
+    image_prompt: >-
+      Medium shot of Antonius seated alone on flat shoreline stones, a
+      worn deck of cards fanned in one flipper, practicing a sleight
+      unobserved. Low morning sun from camera left, long shadows across
+      the stones, shallow depth of field.
+    motion:
+      type: push_in
+      amount: 0.07
+    narration: >-
+      Antonius practices in the mornings. He has always been better with
+      his flippers than with his conscience.
+    music_cue: null
+
+  - id: "060_death_arrives"
+    act: 1
+    publish_order: 6
+    production_priority: high
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Medium-wide shot of Death standing motionless at the tideline, robe
+      hem dark and wet, the sea flat and silver behind. Flat overcast
+      light, symmetrical static composition.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Death comes at low tide, as a professional courtesy.
+    music_cue: null
+
+  - id: "070_face_off"
+    act: 1
+    publish_order: 7
+    production_priority: medium
+    duration: 7.0
+    characters: ["antonius", "death"]
+    image_prompt: >-
+      Two-shot on the stones: Antonius and Death facing one another at a
+      slight distance, a small travel chessboard set on a flat rock
+      between them. Low side light, deep shadows, static wide-normal lens.
+    motion:
+      type: push_in
+      amount: 0.06
+    narration: >-
+      He has come for the circus. Antonius points out, reasonably, that
+      the circus is already dying on its own schedule, and asks for a game
+      first.
+    music_cue: null
+
+  - id: "080_cards_fanned"
+    act: 1
+    publish_order: 8
+    production_priority: medium
+    duration: 6.0
+    characters: ["antonius"]
+    image_prompt: >-
+      Medium shot: Antonius sweeping the chessboard aside with one flipper
+      and fanning three playing cards face-up on the stone in its place,
+      Death's robe visible at the frame edge. Low raking light, shallow
+      depth of field.
+    motion:
+      type: pan_left
+      amount: 0.05
+    narration: >-
+      Not chess. Chess, Antonius says, is for men with time to waste. He
+      offers three cards instead.
+    music_cue: null
+
+  - id: "090_death_considers"
+    act: 1
+    publish_order: 9
+    production_priority: low
+    duration: 5.0
+    characters: ["death"]
+    image_prompt: >-
+      Close shot on Death's hooded face, angled slightly down toward the
+      cards below frame, expression unreadable in the shadow of the hood.
+      Single soft source from below-camera, high contrast.
+    motion:
+      type: push_in
+      amount: 0.05
+    narration: >-
+      Death has played chess for centuries and lost exactly never. He has
+      never played this. He agrees.
+    music_cue: null
+
+  - id: "100_first_hand"
+    act: 1
+    publish_order: 10
+    production_priority: low
+    duration: 6.0
+    characters: ["antonius"]
+    image_prompt: >-
+      Overhead static shot on three cards face down on flat wet stone, a
+      single flipper hovering above the center card, the tide just visible
+      at the frame's edge. Flat top light, hard shadow of the flipper
+      across the cards.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      The rules are explained once, unhurriedly, by the only party who
+      intends to cheat.
+    music_cue: null
+
+  - id: "110_forty_one_losses"
+    act: 1
+    publish_order: 11
+    production_priority: low
+    duration: 6.0
+    characters: []
+    image_prompt: >-
+      Close shot on a stretch of driftwood with dozens of tally marks
+      scratched into the grain, incoming tide beginning to lap at its
+      base. Low evening light raking across the wood grain, shallow depth
+      of field, no figures present.
+    motion:
+      type: push_out
+      amount: 0.06
+    narration: >-
+      Forty-one hands. Forty-one queens found under the wrong shell. The
+      tide erases the count each morning; Antonius keeps his own.
+    music_cue: null
+
+  - id: "120_stay_granted"
+    act: 1
+    publish_order: 12
+    production_priority: medium
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Close-medium shot of Death's hooded head inclined slightly forward
+      in reluctant agreement, dusk light behind him turning the sea to a
+      flat grey sheet. Static composition, soft backlight, low contrast.
+    motion:
+      type: tilt_up
+      amount: 0.05
+    narration: >-
+      A stay is granted, nightly, for as long as the game continues. Death
+      is not accustomed to losing, and finds, to his surprise, that he
+      does not entirely mind.
+    music_cue: null
+
+  # ─── Act 2: the mentalist's tent ──────────────────────────────────────
+  - id: "130_tent_exterior"
+    act: 2
+    publish_order: 13
+    production_priority: medium
+    duration: 5.0
+    characters: []
+    image_prompt: >-
+      Wide shot of a weathered canvas fortune-telling tent at dusk, a
+      small hand-painted sign propped outside, gulls standing motionless
+      nearby on the sand. Even overcast light, wide-angle lens, no figures
+      visible.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Down the coast, Jöns tells fortunes for coins. He does not believe
+      in fortunes. This has never affected business.
+    music_cue: null
+    cut: hard
+
+  - id: "140_jons_at_table"
+    act: 2
+    publish_order: 14
+    production_priority: high
+    duration: 7.0
+    characters: ["jons"]
+    image_prompt: >-
+      Medium shot of Jöns seated behind a small card table inside the
+      tent, monocle catching lamplight, posture slack with boredom. Single
+      warm lamp source from camera left, heavy shadow fill, shallow depth
+      of field.
+    motion:
+      type: push_in
+      amount: 0.05
+    narration: >-
+      Jöns has read ten thousand palms and found the same disappointment
+      in all of them.
+    music_cue: null
+
+  - id: "150_raval_and_gunnar"
+    act: 2
+    publish_order: 15
+    production_priority: high
+    duration: 6.0
+    characters: ["raval", "lilla_gunnar"]
+    image_prompt: >-
+      Medium close shot in the wings behind the tent: Raval adjusting
+      Lilla Gunnar in the crook of one flipper before a performance, both
+      facing slightly off-camera as if rehearsing a line. Soft
+      single-source lamp light, shallow depth of field.
+    motion:
+      type: pan_right
+      amount: 0.05
+    narration: >-
+      Raval throws his voice into a herring named Lilla Gunnar, who is, by
+      most accounts, the more agreeable of the two.
+    music_cue: null
+
+  - id: "160_disguised_patron"
+    act: 2
+    publish_order: 16
+    production_priority: medium
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Wide-medium shot of the tent's interior entrance, a tall hooded
+      patron ducking through the low canvas doorway among two or three
+      seated locals, face obscured entirely by the hood. Available lamp
+      light only, deep shadow, grainy available-light exposure.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      A tall patron in a heavy hood pays admission like anyone else.
+    music_cue: null
+
+  - id: "170_jons_reads_crowd"
+    act: 2
+    publish_order: 17
+    production_priority: low
+    duration: 6.0
+    characters: ["jons"]
+    image_prompt: >-
+      Medium-wide shot of Jöns performing to a small seated audience
+      inside the tent, one flipper raised theatrically over their heads.
+      Single overhead lamp, hard shadows, static composition.
+    motion:
+      type: pan_left
+      amount: 0.05
+    narration: >-
+      Jöns performs the reading he always performs: you will be
+      disappointed, and then you will die. The crowd finds this bracing.
+    music_cue: null
+
+  - id: "180_jons_reads_death"
+    act: 2
+    publish_order: 18
+    production_priority: medium
+    duration: 7.0
+    characters: ["jons", "death"]
+    image_prompt: >-
+      Medium shot: Jöns's raised flipper stops directly over the hooded
+      patron's head mid-gesture, his own expression shifting from
+      performance to genuine surprise. Lamp light from above, shallow
+      depth of field, held static frame.
+    motion:
+      type: push_in
+      amount: 0.06
+    narration: >-
+      He turns to the hooded patron out of habit, and reads something he
+      has never read before.
+    music_cue: null
+
+  - id: "190_the_reading"
+    act: 2
+    publish_order: 19
+    production_priority: low
+    duration: 7.0
+    characters: ["jons"]
+    image_prompt: >-
+      Close shot on Jöns mid-delivery, lamp shadows sharp across his face,
+      posture suddenly stripped of showmanship. Single hard top light,
+      high contrast, static close composition.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Eons of labor, Jöns announces, without gratitude, without rest, and
+      without, lately, feeling much of anything at all. He assumed he was
+      describing the audience.
+    music_cue: null
+
+  - id: "200_death_sniffles"
+    act: 2
+    publish_order: 20
+    production_priority: low
+    duration: 5.0
+    characters: ["death"]
+    image_prompt: >-
+      Close shot on the hooded patron, a pale hand raised to dab beneath
+      the shadowed edge of the hood. Low warm lamp light from
+      below-camera, soft focus fall-off at the frame edges.
+    motion:
+      type: push_in
+      amount: 0.04
+    narration: >-
+      The hooded patron makes a small, wet sound, and does not correct
+      him.
+    music_cue: null
+
+  - id: "210_gunnar_suggests"
+    act: 2
+    publish_order: 21
+    production_priority: medium
+    duration: 7.0
+    characters: ["raval", "lilla_gunnar", "death"]
+    image_prompt: >-
+      Medium close shot: Lilla Gunnar tilted on Raval's flipper toward the
+      hooded patron, Raval's own expression somewhere between
+      mortification and apology. Single lamp source, shallow depth of
+      field, static composition.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Lilla Gunnar, who has an opinion about everything, suggests a
+      professional. Raval, mortified, apologizes. Death, it turns out, is
+      taking notes.
+    music_cue: null
+
+  # ─── Act 3: East 84th Street ───────────────────────────────────────────
+  - id: "220_manhattan_skyline"
+    act: 3
+    publish_order: 22
+    production_priority: medium
+    duration: 6.0
+    characters: []
+    image_prompt: >-
+      Wide shot of a black-and-white Manhattan skyline seen through a
+      small window, streetlights beginning to come on at dusk, the window
+      frame and sill visible in silhouette in the foreground. Long lens
+      compression, no figures present.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      There is, as it happens, a professional. He keeps an office some
+      distance away, on the other side of an ocean he no longer discusses.
+    music_cue: "bach_prelude_c_major_bwv846.mp3"
+    cut: hard
+
+  - id: "230_office_exterior"
+    act: 3
+    publish_order: 23
+    production_priority: low
+    duration: 5.0
+    characters: []
+    image_prompt: >-
+      Close-medium shot on a small brass number plate reading 84 mounted
+      beside a brownstone door, a modest striped awning overhead. Even
+      late-afternoon side light, shallow depth of field, no figures
+      present.
+    motion:
+      type: push_in
+      amount: 0.04
+    narration: >-
+      East Eighty-Fourth Street. The brass plate is small and gives no
+      indication of the clientele.
+    music_cue: null
+
+  - id: "240_selkirk_at_desk"
+    act: 3
+    publish_order: 24
+    production_priority: high
+    duration: 7.0
+    characters: ["selkirk"]
+    image_prompt: >-
+      Medium shot of Dr. Selkirk seated behind a small consulting desk,
+      notebook open, spectacles catching the light of a desk lamp, posture
+      composed and unhurried. Warm single desk-lamp source, soft shadow
+      fill, static frame.
+    motion:
+      type: push_in
+      amount: 0.05
+    narration: >-
+      Dr. S. Selkirk sees patients by appointment. He was, once, the
+      seventh brother in a family act of six. He does not raise this
+      unprompted.
+    music_cue: null
+
+  - id: "250_death_on_couch"
+    act: 3
+    publish_order: 25
+    production_priority: medium
+    duration: 8.0
+    characters: ["death", "selkirk"]
+    image_prompt: >-
+      Wide-medium shot of a psychoanalyst's consulting room: Death
+      reclined on the couch, hood pushed back slightly, an hourglass
+      resting on his chest; Dr. Selkirk seated just out of frame-center in
+      a low armchair, notebook on one knee. Soft window light from camera
+      left, muted contrast.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Death takes the couch, as is customary, and begins, as is not, by
+      apologizing for being early.
+    music_cue: null
+
+  - id: "260_vignette_anhedonia"
+    act: 3
+    publish_order: 26
+    production_priority: low
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Close shot on Death's pale hand slowly turning an hourglass over
+      without watching the sand fall, out-of-focus consulting room behind.
+      Single soft window source, shallow depth of field.
+    motion:
+      type: push_in
+      amount: 0.05
+    narration: >-
+      He reports that the sand no longer holds his attention. Dr. Selkirk
+      writes the word anhedonia, and underlines it, gently.
+    music_cue: null
+
+  - id: "270_vignette_burnout"
+    act: 3
+    publish_order: 27
+    production_priority: low
+    duration: 6.0
+    characters: ["selkirk"]
+    image_prompt: >-
+      Close shot on a desk calendar with every visible day marked off in
+      identical small ticks stretching back further than the frame can
+      hold, one of Dr. Selkirk's flippers resting beside it. Even
+      desk-lamp light, shallow depth of field.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Every day for longer than memory has been, professionally speaking,
+      the same day. Dr. Selkirk knows the feeling. He does not say so.
+    music_cue: null
+
+  - id: "280_vignette_grandiosity"
+    act: 3
+    publish_order: 28
+    production_priority: low
+    duration: 7.0
+    characters: ["death"]
+    image_prompt: >-
+      Wide static shot of the consulting room with Death seated very small
+      and upright in one corner of the frame, dark robe pooling around
+      him, the room's high ceiling and long shadows dwarfing the figure.
+      Available window light, deep negative space, symmetrical framing.
+    motion:
+      type: pan_right
+      amount: 0.05
+    narration: >-
+      He describes himself as vast, eternal, necessary to all things. Dr.
+      Selkirk notes that this is usually what loneliness sounds like when
+      it is embarrassed.
+    music_cue: null
+
+  - id: "290_reschedule_a_death"
+    act: 3
+    publish_order: 29
+    production_priority: low
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Close-medium shot on a black rotary telephone, receiver held to the
+      side of the hooded face just visible at the frame edge, a leather
+      appointment book open on the desk beside it. Warm desk-lamp light,
+      shallow depth of field.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      A call comes in during the session. He reschedules the death for
+      Thursday, apologizes to the room, and continues.
+    music_cue: null
+
+  - id: "300_selkirks_notes"
+    act: 3
+    publish_order: 30
+    production_priority: low
+    duration: 6.0
+    characters: ["selkirk"]
+    image_prompt: >-
+      Close overhead shot on a notebook page mid-sentence in a neat,
+      clinical hand, a fountain pen held in one flipper just lifting off
+      the page. Single desk-lamp source, shallow depth of field, static
+      top-down framing.
+    motion:
+      type: push_in
+      amount: 0.04
+    narration: >-
+      Dr. Selkirk's notes, that evening: patient presents as omnipotent,
+      exhausted, and, underneath both, quite lonely. Prognosis withheld
+      pending further sessions.
+    music_cue: null
+
+  - id: "310_turning_the_tables"
+    act: 3
+    publish_order: 31
+    production_priority: medium
+    duration: 8.0
+    characters: ["death", "selkirk"]
+    image_prompt: >-
+      Medium shot of Death sitting upright on the couch, one long pale
+      hand gesturing toward Dr. Selkirk with sudden, pointed interest; Dr.
+      Selkirk's posture stiffening slightly in his chair. Soft window
+      light, static two-shot framing.
+    motion:
+      type: push_in
+      amount: 0.06
+    narration: >-
+      The patient turns the question back on the doctor. Seven brothers,
+      he observes. Six on a stage. One in this room. Dr. Selkirk writes
+      nothing down for a while.
+    music_cue: null
+
+  # ─── Act 4: the reunion ────────────────────────────────────────────────
+  - id: "320_telegram"
+    act: 4
+    publish_order: 32
+    production_priority: low
+    duration: 5.0
+    characters: []
+    image_prompt: >-
+      Close shot on a telegram slip lying on the consulting desk, typed
+      capitals reading STAY EXPIRES clearly legible, the edge of a
+      notebook and a flipper visible at the frame's edge. Hard desk-lamp
+      light, shallow depth of field.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      Word arrives that the stay is ending. It is, Dr. Selkirk notes,
+      exactly on schedule.
+    music_cue: null
+    cut: hard
+
+  - id: "330_atlantic_crossing"
+    act: 4
+    publish_order: 33
+    production_priority: high
+    duration: 8.0
+    characters: ["selkirk"]
+    image_prompt: >-
+      Wide shot of Dr. Selkirk swimming steadily through open ocean swell,
+      his dark knit tie streaming out flat behind him on the surface, no
+      land visible. Overcast flat light, high vantage slightly above the
+      water, long lens compression.
+    motion:
+      type: pan_right
+      amount: 0.07
+    narration: >-
+      He swims the ocean he crossed once already, tie streaming behind him
+      the entire way, because some habits outlast their usefulness.
+    music_cue: null
+
+  - id: "340_rocks_arrival"
+    act: 4
+    publish_order: 34
+    production_priority: high
+    duration: 8.0
+    characters: ["selkirk", "antonius", "jons", "skat", "plog", "raval", "jof"]
+    image_prompt: >-
+      Wide shot on a cluster of dark northern rocks at twilight: Dr.
+      Selkirk hauling himself out of the water in the foreground, tie
+      soaked flat against him, while his six brothers stand turned toward
+      him in a loose line further up the rocks. Cold blue-grey dusk light,
+      wide-angle lens, static composition.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      His brothers are waiting on the rocks at the old hour, as though he
+      had only stepped out for the evening.
+    music_cue: null
+
+  - id: "350_cream_and_herring"
+    act: 4
+    publish_order: 35
+    production_priority: low
+    duration: 5.0
+    characters: []
+    image_prompt: >-
+      Close-medium shot on a simple spread laid across a flat rock: a
+      shallow bowl of cream and a single herring set carefully to one
+      side, low warm evening light just catching the rims. Shallow depth
+      of field, no figures present.
+    motion:
+      type: push_in
+      amount: 0.04
+    narration: >-
+      There is cream. There is a herring, set aside, out of respect, for
+      later.
+    music_cue: null
+
+  - id: "360_strawberries_scene"
+    act: 4
+    publish_order: 36
+    production_priority: medium
+    duration: 8.0
+    characters: ["selkirk", "jof"]
+    image_prompt: >-
+      Medium shot of Dr. Selkirk and Jof seated together on the rocks
+      sharing the bowl of cream in the low gold light, expressions
+      entirely sincere, unhurried. Warm low side light, shallow depth of
+      field, static two-shot.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      I shall remember this moment, Dr. Selkirk says, quite plainly, and
+      means it without irony, which is the whole joke, and also not a joke
+      at all.
+    music_cue: null
+
+  # ─── Act 5: the last hand ──────────────────────────────────────────────
+  - id: "370_headland_last_light"
+    act: 5
+    publish_order: 37
+    production_priority: medium
+    duration: 7.0
+    characters: ["antonius", "death"]
+    image_prompt: >-
+      Wide-medium shot on a windswept headland at dusk: Antonius and Death
+      seated across from one another on the grass at the cliff's edge,
+      three cards laid between them, the sea pale and flat below. Low
+      failing light, long shadows, static wide-normal lens.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      The last hand is played on the headland, in the failing light, the
+      way all the others were.
+    music_cue: "bach_chaconne_re_minor_excerpt.mp3"
+    cut: hard
+
+  - id: "380_death_hesitates"
+    act: 5
+    publish_order: 38
+    production_priority: low
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Close shot on Death's hooded face turned slightly downward, one long
+      hand hovering motionless above the cards, a visible pause in the
+      gesture. Low side light, high contrast, static close framing.
+    motion:
+      type: push_in
+      amount: 0.05
+    narration: >-
+      Death hesitates. He asks, in language he has recently acquired, how
+      Antonius feels about endings.
+    music_cue: null
+
+  - id: "390_the_palm"
+    act: 5
+    publish_order: 39
+    production_priority: high
+    duration: 5.0
+    characters: ["antonius"]
+    image_prompt: >-
+      Extreme close-up on Antonius's flipper, a small brass-and-glass
+      hourglass concealed against it where a card would ordinarily be, the
+      motion caught mid-palm. Hard raking side light, very shallow depth
+      of field.
+    motion:
+      type: push_in
+      amount: 0.06
+    narration: >-
+      Antonius palms, this time, not the queen.
+    music_cue: null
+
+  - id: "400_hourglass_passed"
+    act: 5
+    publish_order: 40
+    production_priority: medium
+    duration: 7.0
+    characters: ["antonius", "jof"]
+    image_prompt: >-
+      Medium-wide shot along a line of flippers passing the hourglass hand
+      to hand down toward the water's edge, Antonius nearest camera and
+      Jof furthest, each glancing to the next. Cold dusk light,
+      wide-angle lens, static composition.
+    motion:
+      type: pan_right
+      amount: 0.06
+    narration: >-
+      The hourglass goes flipper to flipper down the line, the way the
+      herring was once passed, the way everything here is eventually
+      passed along.
+    music_cue: null
+
+  - id: "410_hourglass_to_sea"
+    act: 5
+    publish_order: 41
+    production_priority: low
+    duration: 6.0
+    characters: []
+    image_prompt: >-
+      Wide static shot on the hourglass afloat and drifting out on the
+      tide, small against the flat grey water, no figures present. Even
+      overcast light, long lens compression.
+    motion:
+      type: push_out
+      amount: 0.05
+    narration: >-
+      It goes out on the tide. No one hurries to retrieve it.
+    music_cue: null
+
+  - id: "420_termination_session"
+    act: 5
+    publish_order: 42
+    production_priority: medium
+    duration: 7.0
+    characters: ["death", "selkirk"]
+    image_prompt: >-
+      Medium shot in the consulting room: Death and Dr. Selkirk each
+      holding one edge of a single sheet of paper between them, a
+      handshake just completing below it, the paper's heading reading
+      Termination Summary. Soft window light, static two-shot framing.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      There is, Dr. Selkirk insists, a proper way to end a course of
+      treatment. Death agrees to the paperwork.
+    music_cue: null
+
+  - id: "430_dawn_ridge_silhouettes"
+    act: 5
+    publish_order: 43
+    production_priority: medium
+    duration: 6.0
+    characters: ["death"]
+    image_prompt: >-
+      Wide static shot along a ridge at first light: a line of small
+      rounded silhouettes and one tall hooded silhouette stand motionless
+      against a pale dawn sky, no detail visible beyond outline. High-key
+      sky, low-key foreground, long lens compression.
+    motion:
+      type: hold
+      amount: 0.0
+    narration: >-
+      His analyst has suggested, gently, that he has difficulty with loss,
+      and has recommended a sabbatical.
+    music_cue: null
+
+  - id: "440_conga_line"
+    act: 5
+    publish_order: 44
+    production_priority: high
+    duration: 8.0
+    characters: ["death"]
+    image_prompt: >-
+      Wide static shot along the same ridge, the line of silhouettes now
+      mid-step in an unmistakable conga formation, hands and flippers on
+      the shoulders ahead, moving off along the horizon against the pale
+      sky. High-key sky, low-key foreground, long lens compression.
+    motion:
+      type: pan_left
+      amount: 0.07
+    narration: >-
+      Six seals and Death go along the ridge in what is, unmistakably, and
+      against all professional decorum, a conga line.
+    music_cue: null
+
+  - id: "450_selkirk_writes"
+    act: 5
+    publish_order: 45
+    production_priority: medium
+    duration: 7.0
+    characters: ["selkirk"]
+    image_prompt: >-
+      Medium shot of Dr. Selkirk alone again at his consulting desk,
+      notebook open to a blank page, fountain pen poised just above it,
+      desk lamp the only light in an otherwise dark room. Warm
+      single-source light, shallow depth of field, static frame.
+    motion:
+      type: push_in
+      amount: 0.04
+    narration: >-
+      Below, on East Eighty-Fourth Street, the seventh brother opens a
+      fresh notebook and begins the case study he will never be permitted
+      to publish. Fin. Fin.
+    music_cue: null
