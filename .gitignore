@@ -27,8 +27,8 @@ audio/music/*.flac
 takes/*.mp4
 !takes/.gitkeep
 
-build/*.mp4
 build/assemble_last_error.log
+build/.scratch/
 !build/.gitkeep
 
 *.log
