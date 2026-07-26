@@ -174,6 +174,16 @@ seventh-seal/
 - **Ingest**: `ingest.min_long_edge_px` (default 2200) — stills below this trigger a
   warning (not a rejection) from `ingest.py`, since the Ken Burns push could upscale.
 
+### Setup
+
+Requires Python 3.11+ and `ffmpeg`/`ffprobe` on `PATH`. Then:
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### The working loop
 
 ```
@@ -224,7 +234,9 @@ from `shots.yaml`, `select.json`, and the filesystem:
   A bad filename, an unknown shot id, or an unreadable image is reported and
   skipped — never crashes the whole scan.
 - **`select.py <shot_id> <version>`** — marks a take as the winner, copies it into
-  `stills/selected/`, and records the choice in `select.json`.
+  `stills/selected/`, and records the choice in `select.json` (`--symlink` links
+  instead of copying). Fails loudly and touches nothing if the shot id or
+  version were never ingested.
 - **`narrate.py`** — `shots.yaml` narration text → `audio/narration/*.wav` via
   edge-tts (or OpenAI tts-1-hd/onyx, once wired up, by flipping `tts.engine`).
 - **`render_shot.py`** — one selected still → one graded Ken Burns clip in `takes/`.

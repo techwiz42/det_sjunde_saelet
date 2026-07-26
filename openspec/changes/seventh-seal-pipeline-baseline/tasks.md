@@ -25,32 +25,33 @@
 - [x] 4.4 Never-overwrite take naming (`<shot_id>_take<N>.mp4`)
 - [ ] 4.5 `tests/test_render_shot_timing.py` covering 4.1's pure functions (frame-count rounding, no-narration/fits/overruns cases for `effective_duration`, ease curve boundary values at p=0/0.5/1)
 
-## 5. Take selection (not yet implemented)
+## 5. Take selection (implemented)
 
-- [ ] 5.1 `scripts/select.py` CLI: `select.py <shot_id> <version>`, validated against ingested raw files (`common.raw_versions_for_shot`)
-- [ ] 5.2 Write/update the shot's `select.json` entry (version + extension)
-- [ ] 5.3 Copy the chosen file into `stills/selected/<shot_id>.<ext>`, replacing any prior selection for that shot
-- [ ] 5.4 Fail loudly (non-zero exit, specific error) on an unknown shot id or a version with no matching ingested file
+- [x] 5.1 `scripts/select.py` CLI: `select.py <shot_id> <version>`, validated against ingested raw files (`common.raw_versions_for_shot`)
+- [x] 5.2 Write/update the shot's `select.json` entry (version + extension)
+- [x] 5.3 Copy the chosen file into `stills/selected/<shot_id>.<ext>`, replacing any prior selection for that shot
+- [x] 5.4 Fail loudly (non-zero exit, specific error) on an unknown shot id or a version with no matching ingested file
 
-## 6. Narration synthesis (not yet implemented)
+## 6. Narration synthesis (implemented)
 
-- [ ] 6.1 `scripts/narrate.py`: iterate shots with non-empty `narration` text
-- [ ] 6.2 edge-tts synthesis path using `config.yaml`'s `tts.edge_tts` (voice/rate/pitch) → `audio/narration/<shot_id>.wav`
-- [ ] 6.3 `tts.engine` dispatch seam: `edge_tts` implemented now; `openai` path raises a clear "not implemented yet" error rather than silently falling back to edge-tts
-- [ ] 6.4 `.narration_cache.json`: hash-of-narration-text change detection so unchanged shots aren't re-synthesized; `--force` override
+- [x] 6.1 `scripts/narrate.py`: iterate shots with non-empty `narration` text
+- [x] 6.2 edge-tts synthesis path using `config.yaml`'s `tts.edge_tts` (voice/rate/pitch) → `audio/narration/<shot_id>.wav`
+- [x] 6.3 `tts.engine` dispatch seam: `edge_tts` implemented now; `openai` path raises a clear "not implemented yet" error rather than silently falling back to edge-tts
+- [x] 6.4 `.narration_cache.json`: hash-of-narration-text change detection so unchanged shots aren't re-synthesized; `--force` override
 
-## 7. Rough-cut assembly (not yet implemented)
+## 7. Rough-cut assembly (implemented)
 
-- [ ] 7.1 Pure timeline function: given ordered `(shot_id, duration, cut_mode)` tuples + `crossfade_frames`, compute each cut's in/out timecodes and transition type
-- [ ] 7.2 `tests/test_assemble_timing.py` covering 7.1 (all-crossfade, all-hard-cut, and mixed sequences; total-duration accounting for crossfade overlap)
-- [ ] 7.3 Slate-card generation (2s, shot id on black) for any shot not in state `ready`
-- [ ] 7.4 ffmpeg filter-complex builder: `xfade` for crossfades, concat for hard cuts, driven by 7.1's timeline
-- [ ] 7.5 Audio mix: per-shot narration + `music_cue` track start/continue-until-next-cue logic
-- [ ] 7.6 Plain-text EDL export alongside the output video
-- [ ] 7.7 Never-overwrite build naming (`build/rough_cut_v<N>.mp4`)
+- [x] 7.1 Pure timeline function: given ordered `(shot_id, duration, cut_mode)` tuples + `crossfade_frames`, compute each cut's in/out timecodes and transition type
+- [x] 7.2 `tests/test_assemble_timing.py` covering 7.1 (all-crossfade, all-hard-cut, and mixed sequences; total-duration accounting for crossfade overlap)
+- [x] 7.3 Slate-card generation (2s, shot id on black) for any shot not in state `ready`
+- [x] 7.4 ffmpeg command builder: `xfade` for crossfades, concat for hard cuts, driven by 7.1's timeline -- implemented as an iterative pairwise fold (not one filter graph spanning every shot) after a single-graph attempt was OOM-killed on a real 45-shot run; see design.md decision #6
+- [x] 7.5 Audio mix: per-shot narration + `music_cue` track start/continue-until-next-cue logic
+- [x] 7.6 Plain-text EDL export alongside the output video
+- [x] 7.7 Never-overwrite build naming (`build/rough_cut_v<N>.mp4`)
+- [x] 7.8 Full-diagnostics failure log (`build/assemble_last_error.log`: failing command + returncode + full stderr) so a host-memory kill is distinguishable from a real ffmpeg/argument bug
 
 ## 8. Verification
 
-- [ ] 8.1 `python -m pytest tests/` passes (render_shot + assemble timing tests)
-- [ ] 8.2 `python scripts/status.py` run end-to-end against real (non-test-fixture) project state, confirm the catalog reflects reality
-- [ ] 8.3 `README.md`'s working loop re-checked against every script's final CLI flags
+- [x] 8.1 `python -m pytest tests/` passes (render_shot + assemble timing tests) -- 34 passed
+- [x] 8.2 `python scripts/status.py` run end-to-end against real (non-test-fixture) project state, confirm the catalog reflects reality -- 44 `awaiting_still`, 1 `needs_select` (`240_selkirk_at_desk`), matches reality exactly
+- [x] 8.3 `README.md`'s working loop re-checked against every script's final CLI flags -- added the missing Setup section (venv/requirements.txt) and a `select.py --symlink` mention; everything else already matched

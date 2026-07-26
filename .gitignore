@@ -9,8 +9,14 @@ stills/selected/*.jpg
 stills/selected/*.jpeg
 !stills/selected/.gitkeep
 
+stills/reference/*.png
+stills/reference/*.jpg
+stills/reference/*.jpeg
+!stills/reference/.gitkeep
+
 audio/narration/*.wav
 audio/narration/*.mp3
+audio/narration/.narration_cache.json
 !audio/narration/.gitkeep
 
 audio/music/*.wav
@@ -22,6 +28,7 @@ takes/*.mp4
 !takes/.gitkeep
 
 build/*.mp4
+build/assemble_last_error.log
 !build/.gitkeep
 
 *.log
