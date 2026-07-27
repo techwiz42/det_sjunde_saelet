@@ -108,43 +108,65 @@ the OpenAI engine exists) not free. Hashing the source text is simpler and
 more honest than mtime-based detection, since the text lives inside
 `shots.yaml`, not as a standalone file with its own mtime.
 
-### 6. Assembly transitions: iterative pairwise fold, not one filter graph
+### 6. Assembly transitions: per-shot solo segments + tiny transition clips, joined by stream-copy concat
 **Decision (implemented):** `assemble.py` computes the whole film's cut
 timeline as a pure function (`compute_timeline`) over an ordered list of
 `(shot_id, duration, cut_mode)` tuples — independent of ffmpeg, unit tested
-in `tests/test_assemble_timing.py` — then realizes it in two passes:
+in `tests/test_assemble_timing.py` — then realizes it in three passes:
 1. Every shot (take or slate) is normalized to the project's fps/resolution/
    format/timebase as its own small file (`render_normalized_clip`).
-2. Those clips are folded **pairwise**, in timeline order, with ffmpeg's
-   `xfade` (crossfade) or `concat` (hard cut) filter: each fold reads the
-   running cut-so-far plus the next clip and writes a new running file,
-   discarding the previous one. Only the audio mix (`amix`/`adelay`, plus
-   the running video's final mux) touches every shot's data in one command.
+2. For each shot, `build_video_segments` trims its clip down to just the
+   non-overlapping "solo" body (`trim_solo_segment` — a plain `-vf trim`
+   re-encode of *that one shot's own duration*, nothing else), and for each
+   crossfade, `build_transition_clip` renders just the `crossfade_frames`
+   overlap window as its own standalone clip (each side trimmed to exactly
+   the overlap first, then `xfade`'d at `offset=0`). A shot untouched by any
+   crossfade reuses its normalized clip directly — no extra re-encode.
+3. The ordered solo/transition segments are joined with ffmpeg's concat
+   demuxer and `-c copy` (`concat_segments`) — a stream copy, not a
+   re-encode, since every segment already shares identical codec/format/
+   timebase. Only the audio mix (`amix`/`adelay`, plus the final video mux)
+   touches every shot's data in one command.
 
-**Why over a single filter_complex spanning all N shots:** that was the
-first implementation, and a real 45-shot run of it was killed by the
-kernel OOM killer (`returncode -9`) — a filter graph with every shot as a
-live input has to keep all of them decodable simultaneously, so peak memory
-scales with film length. The iterative fold caps peak memory at "two clips"
-regardless of how long the film gets, which is the actual requirement for a
-tool meant to grow to feature length. Confirmed against both a 3-shot
-slate-only smoke test (succeeded, crossfade timings matched
-`compute_timeline`'s numbers exactly) and the full 45-shot catalog (the
-architecture completes normalize+fold correctly; on this project's specific
-host, individual fold steps have also been killed by *host-wide* memory
-pressure from ~36 unrelated Docker containers competing for the same
-15GB — an environmental condition, not a defect in this design, and outside
-what any in-process memory bound can fully protect against).
+**History — two prior designs, both scale with film length despite
+looking bounded:**
+- **v1: single filter_complex spanning all N shots.** A real 45-shot run
+  was killed by the kernel OOM killer (`returncode -9`) — a filter graph
+  with every shot as a live input has to keep all of them decodable
+  simultaneously, so peak memory scales with film length.
+- **v2: iterative pairwise fold.** Replaced v1 on the theory that folding
+  two clips at a time caps peak memory at "two clips" regardless of film
+  length. It doesn't: each fold step still fully decodes and re-encodes the
+  entire *accumulated-so-far* running clip, not just the two nominal
+  inputs, so total work (and, on a memory-constrained host, peak resident
+  set) still scales with position in the film. Confirmed directly: two
+  independent real 45-shot runs — one with ~1GB more host memory headroom
+  than the other — both died at the same ~70-80s mark of accumulated
+  duration (fold step 9 and step 10 respectively), not at a fixed step
+  count. That "same duration, different step" signature is what rules out
+  pure host-wide pressure as the sole explanation and points at the design
+  itself.
 
-**Trade-off accepted:** roughly `2N - 1` ffmpeg invocations for an N-shot
-film (N normalizes + N-1 folds) instead of 1, and each fold is a real
-re-encode generation (mitigated by using a higher-quality intermediate CRF
-than the final deliverable's, since only the last generation is the actual
-delivered file) — more wall-clock and more re-encoding than a single graph,
-in exchange for memory use that never depends on film length. Consistent
-with this project's own precedent elsewhere (companion tool's `build.py`:
-"Both normalize() and the final concat ALWAYS re-encode, never
-stream-copy... correctness over speed here").
+**Why v3 (this decision) actually is bounded:** no ffmpeg invocation ever
+touches more than one shot's own duration (solo trim), the fixed
+`crossfade_frames` window (transition clips), or does a real decode/encode
+of the full timeline at all (the final concat is a stream copy). Per-
+invocation cost is therefore independent of N and of position in the film —
+verified against the full 45-shot catalog completing normalize + segment-
+build + concat without incident on this project's host, at whatever memory
+headroom happened to be available at the time (not a specially-freed-up
+window).
+
+**Trade-off accepted:** roughly `3N` ffmpeg invocations in the worst case
+(N normalizes + up to N solo trims + up to N-1 transition clips) before the
+one stream-copy concat and the one final audio mux/mux-out — more
+invocations than v2, but each one is now cheap and flat-cost, so total
+wall-clock is lower in practice, not higher. Consistent with this project's
+own precedent elsewhere (companion tool's `build.py`: "Both normalize() and
+the final concat ALWAYS re-encode, never stream-copy... correctness over
+speed here") for the parts that must be re-encoded (solo trims, transitions)
+— stream-copy is used only for the final join, where no filtering is
+happening and none is needed.
 
 ### 7. EDL as plain text, not a broadcast-standard CMX3600 file
 **Decision:** The EDL export is a simple, readable text log (shot id, in/out
@@ -157,12 +179,16 @@ reviewing a rough cut satisfies the actual need at far less complexity.
 
 - **[Risk]** This project's host is a shared, heavily-loaded server (other
   projects' Docker containers and backend processes routinely leave under
-  200MB of the machine's 15GB genuinely free). Even a memory-bounded ffmpeg
-  step can be OOM-killed by host-wide pressure that has nothing to do with
-  this pipeline. → **Mitigation:** `assemble.py`'s failure path writes the
+  200MB of the machine's 15GB genuinely free). Even a per-shot-bounded
+  ffmpeg step can in principle be OOM-killed by host-wide pressure that has
+  nothing to do with this pipeline. → **Mitigation:** decision #6 (v3)
+  keeps every individual ffmpeg invocation's cost bounded by one shot's own
+  duration or the fixed crossfade window, never by total film length, which
+  is what actually matters on a host this constrained — v1 and v2 both
+  looked bounded but weren't. `assemble.py`'s failure path still writes the
   full failing command + ffmpeg stderr to `build/assemble_last_error.log`
-  (not a truncated tail) specifically so a host-pressure kill
-  (`returncode -9`, no ffmpeg error text) is easy to tell apart from an
+  (not a truncated tail) so that if host pressure ever does kill a step
+  (`returncode -9`, no ffmpeg error text), it's easy to tell apart from an
   actual filter-graph or argument bug. No further mitigation belongs in this
   project — freeing host memory is an operational decision for whoever
   manages the other workloads on that machine, not something a single
@@ -178,11 +204,12 @@ reviewing a rough cut satisfies the actual need at far less complexity.
   notice. → **Mitigation:** this is exactly why `tts.engine` exists as a
   config seam; the project accepts this risk in exchange for zero cost, per
   explicit project mandate.
-- **[Risk]** A 45-shot rough cut with per-shot `xfade` folding is O(n)
-  sequential ffmpeg filter stages, which can get slow to re-render in full.
-  → **Mitigation:** out of scope for this baseline; acceptable at current
-  scale (a few hundred seconds of output), revisit only if it becomes a
-  measured bottleneck.
+- **[Risk]** A 45-shot rough cut involves roughly `3N` ffmpeg invocations
+  (decision #6, v3) before the final concat and audio mux, which can get
+  slow to re-render in full even though each invocation is individually
+  cheap. → **Mitigation:** out of scope for this baseline; acceptable at
+  current scale (a few hundred seconds of output), revisit only if it
+  becomes a measured bottleneck.
 
 ## Migration Plan
 Not applicable — greenfield project, no existing users or data to migrate.
