@@ -526,10 +526,14 @@ shots:
     characters: ["death", "selkirk"]
     image_prompt: >-
       Wide-medium shot of a psychoanalyst's consulting room: Death
-      reclined on the couch, hood pushed back slightly, an hourglass
-      resting on his chest; Dr. Selkirk seated just out of frame-center in
-      a low armchair, notebook on one knee. Soft window light from camera
-      left, muted contrast.
+      reclined full-length along an analyst's couch, hood drawn fully
+      forward so his face and features are entirely hidden in shadow
+      beneath the hood (no visible skull, no visible facial detail of any
+      kind -- a featureless dark void under the hood, exactly as in every
+      other appearance of this character), an hourglass resting on his
+      chest; Dr. Selkirk seated just out of frame-center in a low
+      armchair, notebook on one knee. Soft window light from camera left,
+      muted contrast.
     motion:
       type: hold
       amount: 0.0
@@ -873,10 +877,14 @@ shots:
     duration: 6.0
     characters: ["death"]
     image_prompt: >-
-      Wide static shot along a ridge at first light: a line of small
-      rounded silhouettes and one tall hooded silhouette stand motionless
-      against a pale dawn sky, no detail visible beyond outline. High-key
-      sky, low-key foreground, long lens compression.
+      Wide static shot along a ridge at first light: a line of exactly six
+      small silhouettes, each with the rounded, legless, torpedo-shaped
+      outline of a seal's body tapering to a tail flipper -- no arms, no
+      legs, no human limbs, unmistakably animal silhouettes, not human
+      ones -- standing alongside one separate, taller silhouette in an
+      unmistakably human-shaped hooded robe, all motionless against a pale
+      dawn sky, no detail visible beyond outline. High-key sky, low-key
+      foreground, long lens compression.
     motion:
       type: hold
       amount: 0.0
@@ -892,10 +900,14 @@ shots:
     duration: 8.0
     characters: ["death"]
     image_prompt: >-
-      Wide static shot along the same ridge, the line of silhouettes now
-      mid-step in an unmistakable conga formation, hands and flippers on
-      the shoulders ahead, moving off along the horizon against the pale
-      sky. High-key sky, low-key foreground, long lens compression.
+      Wide static shot along the same ridge: the same six rounded,
+      legless, torpedo-shaped seal silhouettes (no arms, no legs, no human
+      limbs -- unmistakably animal outlines, not human figures) now
+      undulating mid-motion in a conga-line formation behind one separate,
+      taller, unmistakably human-shaped hooded silhouette, each seal's
+      body angled against the one ahead of it, the whole line moving off
+      along the horizon against the pale sky. High-key sky, low-key
+      foreground, long lens compression.
     motion:
       type: pan_left
       amount: 0.07
